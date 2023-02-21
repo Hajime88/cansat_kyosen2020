@@ -1,48 +1,50 @@
 bgr = [10,10,130]
 
-#放出検知
-def release_detect():
-    
-#落下検知
-def drop_detect():
+class MOTOR_CTL:
 
-#パラシュート分離
-def sep_parachute():
+    #放出検知
+    def release_detect():
 
-#位置推定
-def estimate_pos():
-    angle = 0
-    return angle
+    #落下検知
+    def drop_detect():
 
-##モーター##
-def turn_right(angle):
+    #パラシュート分離
+    def sep_parachute():
 
-def turn_left(angle):
+    #位置推定
+    def estimate_pos():
+        angle = 0
+        return angle
 
-def turn(angle):
-    if angle <= 0:
-        turn_right(abs(angle))
-    if angle >0:
-        turn_left(angle)
+    ##モーター##
+    def turn_right(angle):
 
-def go_straight():
+    def turn_left(angle):
 
-def img_thresh(img,bgr):
+    def turn(angle):
+        if angle <= 0:
+            turn_right(abs(angle))
+        if angle >0:
+            turn_left(angle)
 
-def calc_center(ThreshImage):
+    def go_straight():
 
-def  main():
+    def img_thresh(img,bgr):
 
-    #例えばwhileループとかで待ち作る？
-    while release_detect()==0:
-        print("False")
-    #落下検知も放出検知と同様
-    drop_detect()
-    sep_parachute()
-    angle = estimate_pos()
-    turn(angle)
-    go_straight()
-    #画像取得
+    def calc_center(ThreshImage):
+
+    def  main():
+
+        #例えばwhileループとかで待ち作る？
+        while release_detect()==0:
+            print("False")
+        #落下検知も放出検知と同様
+        drop_detect()
+        sep_parachute()
+        angle = estimate_pos()
+        turn(angle)
+        go_straight()
+        #画像取得
 
     while True:
 
