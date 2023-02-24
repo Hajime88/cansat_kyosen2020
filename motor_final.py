@@ -92,11 +92,19 @@ def rotation(i):
     fai = 0 #[deg] ここに回転角を入力
     W = 0.15 #[m] タイヤ間距離
 
-    #右輪は前進、左輪は後退(中心位置は固定)
-    GPIO.output(AIN1, GPIO.HIGH)
-    GPIO.output(AIN2, GPIO.LOW)
-    GPIO.output(BIN1, GPIO.LOW)
-    GPIO.output(BIN2, GPIO.HIGH)
+    if i > 0:
+        #右輪は前進、左輪は後退(中心位置は固定)
+        GPIO.output(AIN1, GPIO.HIGH)
+        GPIO.output(AIN2, GPIO.LOW)
+        GPIO.output(BIN1, GPIO.LOW)
+        GPIO.output(BIN2, GPIO.HIGH)
+    
+    else:
+        #右輪は後退、左輪は前進
+        GPIO.output(AIN1, GPIO.LOW)
+        GPIO.output(AIN2, GPIO.HIGH)
+        GPIO.output(BIN1, GPIO.HIGH)
+        GPIO.output(BIN2, GPIO.LOW)
 
     while(abs(fai) < abs(i)):
         R_d, L_d = distance() #エンコーダのファイルより
