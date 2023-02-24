@@ -119,12 +119,12 @@ def destroy():
 #試験用のプログラム
 def test(forward, back, turn):
     forward(forward)
-    brake
+    brake()
 
     back(back)
-    brake
+    brake()
 
     rotation(turn)
-    brake
+    brake()
 
     destroy()
