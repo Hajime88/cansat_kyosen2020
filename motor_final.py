@@ -6,7 +6,7 @@ import time
 import math
 
 #encoder_finalのインポート→よく分からんから任せた！
-from encoder_final import distance
+from encoder_final import distance, pulse_count
 
 AIN1 = 16
 AIN2 = 18 
