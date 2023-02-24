@@ -6,7 +6,7 @@ import time
 import math
 
 #encoder_finalのインポート→よく分からんから任せた！
-from encoder_final import distance, pulse_count
+from encoder_final import distance, pulse_count, enc_destroy
 
 AIN1 = 16
 AIN2 = 18 
@@ -17,7 +17,7 @@ PWMB = 35
 
 #ここから初期設定#
 
-GPIO.setmode(GPIO.BOARD)
+GPIO.setmode(GPIO.BOARD) #エンコーダ側とBOARD,BCMはそろえた方がよい？
 
 #各ピンを出力に設定
 GPIO.setup(AIN1, GPIO.OUT, initial = GPIO.LOW)
@@ -110,6 +110,9 @@ def destroy():
 
     #GPIOピンの解放
     GPIO.cleanup()
+
+    #エンコーダに関するピンも解放
+    enc_destroy()
 
     print("end of program")
 

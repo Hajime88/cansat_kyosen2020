@@ -4,22 +4,21 @@ import RPi.GPIO as GPIO
 import math
 import time
 
-LXPin = 7
-LAPin = 12
-LBPin = 1
-RXPin = 4
-RAPin = 27
-RBPin = 22
+LXPin = 7 #26 (BOARD)
+LAPin = 12 #32
+LBPin = 1  #28
+RXPin = 4 #7
+RAPin = 27 #13
+RBPin = 22 #15
 
 #初期設定
-def setup():
-    GPIO.setmode(GPIO.BCM)
-    GPIO.setup(LXPin, GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
-    GPIO.setup(LAPin, GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
-    GPIO.setup(LBPin, GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
-    GPIO.setup(RXPin, GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
-    GPIO.setup(RAPin, GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
-    GPIO.setup(RBPin, GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
+GPIO.setmode(GPIO.BCM) #BOARDにそろえた方がよい？
+GPIO.setup(LXPin, GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
+GPIO.setup(LAPin, GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
+GPIO.setup(LBPin, GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
+GPIO.setup(RXPin, GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
+GPIO.setup(RAPin, GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
+GPIO.setup(RBPin, GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
 
 #エンコーダのパルスをカウント
 def pulse_count(APin, BPin):
@@ -41,8 +40,8 @@ def pulse_count(APin, BPin):
 #タイヤがそれぞれ進んだ距離の算出(今は1秒ごと)
 def distance():
     pulse = 500 #ppr
-    l = 0.4 #[m] タイヤが一回転する間に進む距離
-    k = 0.9 #値を調整するための係数
+    l = 0.4 #[m] タイヤが一回転する間に進む距離:要再計測
+    k = 1 #値を調整するための係数:要調整
     
     R_count_1 = pulse_count(RAPin, RBPin)
     L_count_1 = pulse_count(LAPin, LBPin)
@@ -68,7 +67,7 @@ def location(x, y, fai, R_d, L_d):
     return x, y, fai
 
 #終了する用
-def destroy():
+def enc_destroy():
     GPIO.cleanup()
     print("program end")
 
@@ -78,16 +77,12 @@ def loop():
     y = 0
     fai = 0
     
-    while True: #average
+    while True:
         R_d, L_d = distance()
         
         x, y, fai = location(x, y, fai, R_d, L_d)
         print(x, y)
-        #if x > 10:
-            #break
-    
-    #destroy()
 
+#1秒ずつ位置を出力
 if __name__ == '__main__':
-    setup()
     loop()
