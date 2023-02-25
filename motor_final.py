@@ -5,19 +5,19 @@ import RPi.GPIO as GPIO
 import time
 import math
 
-#encoder_finalのインポート→よく分からんから任せた！
-from encoder_final import distance, pulse_count, enc_destroy
+#encoder_finalのインポート
+from encoder_final import distance, pulse_count
 
-AIN1 = 16
-AIN2 = 18 
-PWMA = 12
-BIN1 = 36
-BIN2 = 38
-PWMB = 35
+AIN1 = 23 #16(BOARD)
+AIN2 = 24 #18 
+PWMA = 18 #12
+BIN1 = 20 #38
+BIN2 = 16 #36
+PWMB = 19 #35 ここは前進、後退を要確認
 
 #ここから初期設定#
 
-GPIO.setmode(GPIO.BOARD) #エンコーダ側とBOARD,BCMはそろえた方がよい？
+GPIO.setmode(GPIO.BCM) 
 
 #各ピンを出力に設定
 GPIO.setup(AIN1, GPIO.OUT, initial = GPIO.LOW)
@@ -69,6 +69,7 @@ def forward(d):
         #エンコーダで距離を計測(約1秒ごとに値を取得)
         R_d, L_d = distance() #エンコーダのファイルより
         l = l+(R_d+L_d)/2
+        print(l) #練習用
 
 #後退の関数
 #d[m]戻るまで後退
@@ -83,8 +84,9 @@ def back(d):
 
     while(l<d):
         #エンコーダで距離を計測
-        R_d, L_d = -distance() #エンコーダのファイルより
-        l = l+(R_d+L_d)/2
+        R_d, L_d = distance() #エンコーダのファイルより
+        l = l-(R_d+L_d)/2
+        print(l) #練習用
 
 #回転の関数
 #進行方向に対して左にi[deg]だけ回転(-180<i<180)
@@ -109,6 +111,7 @@ def rotation(i):
     while(abs(fai) < abs(i)):
         R_d, L_d = distance() #エンコーダのファイルより
         fai = fai+(R_d-L_d)/W*180/math.pi
+        print(fai) #練習用
 
 #終了用
 def destroy():
@@ -119,17 +122,14 @@ def destroy():
     #GPIOピンの解放
     GPIO.cleanup()
 
-    #エンコーダに関するピンも解放
-    enc_destroy()
-
     print("end of program")
 
 #試験用のプログラム
-def test(forward, back, turn):
-    forward(forward)
+def test(x, y, turn):
+    forward(x)
     brake()
 
-    back(back)
+    back(y)
     brake()
 
     rotation(turn)

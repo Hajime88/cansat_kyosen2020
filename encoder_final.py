@@ -4,15 +4,15 @@ import RPi.GPIO as GPIO
 import math
 import time
 
-LXPin = 26 #7(BCM)
-LAPin = 32 #12
-LBPin = 28 #1
-RXPin = 7 #4
-RAPin = 13 #27
-RBPin = 15 #22
+LXPin = 7 #26(BOARD)
+LAPin = 12 #32 
+LBPin = 1 #28 
+RXPin = 4 #7 
+RAPin = 27 #13 
+RBPin = 22 #15 
 
 #初期設定
-GPIO.setmode(GPIO.BOARD) 
+GPIO.setmode(GPIO.BCM) 
 GPIO.setup(LXPin, GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
 GPIO.setup(LAPin, GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
 GPIO.setup(LBPin, GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
