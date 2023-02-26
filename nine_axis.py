@@ -81,8 +81,7 @@ def get_heading():
         ##########
         ## Note:## Headings will not be correct until a full 360 deg calibration turn has been completed to generate amin and amax data ##
         ##########
-        print("Heading: {}".format(heading))
         
+        print("Heading: {}".format(heading))
         #print(mag)
-
         time.sleep(0.1)
