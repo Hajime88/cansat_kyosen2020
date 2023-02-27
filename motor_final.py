@@ -8,12 +8,12 @@ import math
 #encoder_finalのインポート
 from encoder_final import distance, pulse_count
 
-AIN1 = 23 #16(BOARD)
-AIN2 = 24 #18 
+AIN1 = 24 #18 左
+AIN2 = 23 #16
 PWMA = 18 #12
-BIN1 = 20 #38
-BIN2 = 16 #36
-PWMB = 19 #35 ここは前進、後退を要確認
+BIN1 = 16 #36 右
+BIN2 = 20 #38
+PWMB = 19 #35
 
 #ここから初期設定#
 
@@ -38,7 +38,7 @@ p_b.start(0)
 
 #デューティを設定(0~100の範囲で指定)
 #速度は80%で走行する。
-val = 80
+val = 100
 
 #デューティ比を設定
 p_a.ChangeDutyCycle(val)
@@ -69,7 +69,7 @@ def forward(d):
         #エンコーダで距離を計測(約1秒ごとに値を取得)
         R_d, L_d = distance() #エンコーダのファイルより
         l = l+(R_d+L_d)/2
-        print(l) #練習用
+        print(l)
 
 #後退の関数
 #d[m]戻るまで後退
@@ -86,32 +86,32 @@ def back(d):
         #エンコーダで距離を計測
         R_d, L_d = distance() #エンコーダのファイルより
         l = l-(R_d+L_d)/2
-        print(l) #練習用
+        print(-l)
 
 #回転の関数
 #進行方向に対して左にi[deg]だけ回転(-180<i<180)
 def rotation(i):
     fai = 0 #[deg] ここに回転角を入力
-    W = 0.15 #[m] タイヤ間距離
+    W = 0.2 #[m] タイヤ間距離
 
     if i > 0:
-        #右輪は前進、左輪は後退(中心位置は固定)
-        GPIO.output(AIN1, GPIO.HIGH)
+        #右輪は前進、左輪は停止
+        GPIO.output(AIN1, GPIO.LOw)
         GPIO.output(AIN2, GPIO.LOW)
         GPIO.output(BIN1, GPIO.LOW)
         GPIO.output(BIN2, GPIO.HIGH)
     
     else:
-        #右輪は後退、左輪は前進
+        #右輪は停止、左輪は前進
         GPIO.output(AIN1, GPIO.LOW)
         GPIO.output(AIN2, GPIO.HIGH)
-        GPIO.output(BIN1, GPIO.HIGH)
+        GPIO.output(BIN1, GPIO.LOW)
         GPIO.output(BIN2, GPIO.LOW)
 
     while(abs(fai) < abs(i)):
         R_d, L_d = distance() #エンコーダのファイルより
         fai = fai+(R_d-L_d)/W*180/math.pi
-        print(fai) #練習用
+        print(fai)
 
 #終了用
 def destroy():
@@ -134,5 +134,11 @@ def test(x, y, turn):
 
     rotation(turn)
     brake()
-
+    
     destroy()
+
+try:
+    test(0, 0, 45)
+except KeyboardInterrupt:
+    destroy()
+    print("program stopped")

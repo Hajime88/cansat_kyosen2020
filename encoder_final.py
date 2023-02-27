@@ -4,12 +4,12 @@ import RPi.GPIO as GPIO
 import math
 import time
 
-LXPin = 7 #26(BOARD)
-LAPin = 12 #32 
-LBPin = 1 #28 
-RXPin = 4 #7 
-RAPin = 27 #13 
-RBPin = 22 #15 
+LXPin = 7 #7(BCM)
+LAPin = 12 #12
+LBPin = 1 #1
+RXPin = 4 #4
+RAPin = 27 #27
+RBPin = 22 #22
 
 #初期設定
 GPIO.setmode(GPIO.BCM) 
@@ -25,8 +25,8 @@ def pulse_count(APin, BPin):
     count = 0
     start = time.perf_counter()
     
-    while (time.perf_counter()-start < 0.25):
-        a = GPIO.wait_for_edge(APin, GPIO.FALLING, timeout=250)
+    while (time.perf_counter()-start < 0.125):
+        a = GPIO.wait_for_edge(APin, GPIO.FALLING, timeout=125)
       
         if a is None:
             count = 0
@@ -37,11 +37,11 @@ def pulse_count(APin, BPin):
                 count = count+1
     return(count)
 
-#タイヤがそれぞれ進んだ距離の算出(今は1秒ごと)
+#タイヤがそれぞれ進んだ距離の算出(今は0.5秒ごと)
 def distance():
     pulse = 500 #ppr
     l = 0.4 #[m] タイヤが一回転する間に進む距離:要再計測
-    k = 1 #値を調整するための係数:要調整
+    k = 0.9 #値を調整するための係数:要調整
     
     R_count_1 = pulse_count(RAPin, RBPin)
     L_count_1 = pulse_count(LAPin, LBPin)
@@ -58,7 +58,7 @@ def distance():
 
 #位置の推定
 def location(x, y, fai, R_d, L_d):
-    W = 0.15 #[m] タイヤ間距離
+    W = 0.2 #[m] タイヤ間距離
 
     fai = fai+(R_d-L_d)/W #[rad]
     x = x+(R_d+L_d)/2*math.cos(fai/2) #[m]
@@ -85,4 +85,7 @@ def loop():
 
 #1秒ずつ位置を出力
 if __name__ == '__main__':
-    loop()
+    try:
+        loop()
+    except KeyboardInterrupt:
+        enc_destroy()
