@@ -1,6 +1,5 @@
 from nine_axis import *
 from parachute import *
-
 import time
 from icm20948 import ICM20948
 
@@ -32,22 +31,26 @@ def get_atotal():
 
 
 drop_counter = 0
-impact_counter = 0
+stop_counter = 0
 
 #drop_counterは試験をして調整
-while drop_counter < 2:
+while drop_counter < 10:
     atotal = get_atotal()
     print("not detect drop",atotal)
     if atotal < 0.4:
         print("falling!",atotal)
         drop_counter = drop_counter + 1
-    time.sleep(0.25)
+    time.sleep(0.01)
     
 
-while impact_counter < 1:
+while stop_counter < 1:
     atotal = get_atotal()
     print("not detect stop",atotal)
-    if abs(atotal) > 5:
-        print("landed!",atotal)
-        impact_counter = impact_counter + 1
-    time.sleep(0.25)
+    if abs(atotal) > 10:
+        print("impact!",atotal)
+        stop_counter = stop_counter + 1
+    time.sleep(0.01)
+
+print("landed!")
+
+parachute_sep()
