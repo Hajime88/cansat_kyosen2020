@@ -4,12 +4,12 @@ import RPi.GPIO as GPIO
 import math
 import time
 
-LXPin = 7 #7(BCM)
-LAPin = 12 #12
-LBPin = 1 #1
-RXPin = 4 #4
-RAPin = 27 #27
-RBPin = 22 #22
+LXPin = 7
+LAPin = 12
+LBPin = 1
+RXPin = 4
+RAPin = 27 
+RBPin = 19  #←変更済み 
 
 #初期設定
 GPIO.setmode(GPIO.BCM) 
@@ -25,8 +25,8 @@ def pulse_count(APin, BPin):
     count = 0
     start = time.perf_counter()
     
-    while (time.perf_counter()-start < 0.125):
-        a = GPIO.wait_for_edge(APin, GPIO.FALLING, timeout=125)
+    while (time.perf_counter()-start < 0.05):
+        a = GPIO.wait_for_edge(APin, GPIO.FALLING, timeout=50)
       
         if a is None:
             count = 0
@@ -37,7 +37,7 @@ def pulse_count(APin, BPin):
                 count = count+1
     return(count)
 
-#タイヤがそれぞれ進んだ距離の算出(今は0.5秒ごと)
+#タイヤがそれぞれ進んだ距離の算出(今は0.2秒ごと)
 def distance():
     pulse = 500 #ppr
     l = 0.4 #[m] タイヤが一回転する間に進む距離:要再計測

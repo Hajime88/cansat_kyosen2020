@@ -66,7 +66,7 @@ def forward(d):
     GPIO.output(BIN2, GPIO.HIGH)
 
     while(l < d):
-        #エンコーダで距離を計測(約1秒ごとに値を取得)
+        #エンコーダで距離を計測(約0.2秒ごとに値を取得)
         R_d, L_d = distance() #エンコーダのファイルより
         l = l+(R_d+L_d)/2
         print(l)
@@ -96,7 +96,7 @@ def rotation(i):
 
     if i > 0:
         #右輪は前進、左輪は停止
-        GPIO.output(AIN1, GPIO.LOw)
+        GPIO.output(AIN1, GPIO.LOW)
         GPIO.output(AIN2, GPIO.LOW)
         GPIO.output(BIN1, GPIO.LOW)
         GPIO.output(BIN2, GPIO.HIGH)
@@ -108,7 +108,7 @@ def rotation(i):
         GPIO.output(BIN1, GPIO.LOW)
         GPIO.output(BIN2, GPIO.LOW)
 
-    while(abs(fai) < abs(i)):
+    while(abs(fai) < abs(i)-10): #この設定だと誤差が±10度くらいに収まるはず
         R_d, L_d = distance() #エンコーダのファイルより
         fai = fai+(R_d-L_d)/W*180/math.pi
         print(fai)
