@@ -2,8 +2,8 @@ from nine_axis import *
 from parachute import *
 import time
 from icm20948 import ICM20948
-
-
+from led import *
+import serial
 
 imu = ICM20948()
 vx, vy, vz = 0, 0, 0
@@ -29,28 +29,59 @@ def get_atotal():
     #print("Accel_Total: {:05.4f} ".format(atotal))
     return atotal
 
-
 drop_counter = 0
 stop_counter = 0
+land_counter = 0
+green_light_on()
+
+def SerWrite(msg):
+    ser.write((msg+"\r\n").encode("utf-8"))
+
+try:
+    ser = serial.Serial('/dev/ttyAMA0', 115200, timeout=0.1)
+    print("open serial port")
+    SerWrite("open serial port")
+except:
+    print("cannot open serial port")
+    exit(1)   
 
 #drop_counterは試験をして調整
-while drop_counter < 10:
+while drop_counter < 5:
     atotal = get_atotal()
     print("not detect drop",atotal)
-    if atotal < 0.4:
+    SerWrite("not detect drop "+str(atotal))
+    if atotal < 0.1:
         print("falling!",atotal)
+        SerWrite("falling! "+str(atotal))
         drop_counter = drop_counter + 1
-    time.sleep(0.01)
-    
+    time.sleep(0.05)
+
 
 while stop_counter < 1:
     atotal = get_atotal()
     print("not detect stop",atotal)
-    if abs(atotal) > 10:
+    SerWrite("not detect stop "+str(atotal))
+    if abs(atotal) > 30:
         print("impact!",atotal)
+        SerWrite("impact! "+str(atotal))
+        time.sleep(0.1)
+        print("impact!",atotal)
+        SerWrite("impact! "+str(atotal))
+        time.sleep(0.1)
+        print("impact!",atotal)
+        SerWrite("impact! "+str(atotal))
         stop_counter = stop_counter + 1
+    
     time.sleep(0.01)
 
-print("landed!")
+while land_counter < 30:
+    print("landed!")
+    SerWrite("landed!")
+    land_counter = land_counter + 1
+    time.sleep(0.1)
 
+green_light_off()
+red_light_on()
 parachute_sep()
+
+red_light_off()
