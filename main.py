@@ -6,6 +6,7 @@ import cv2
 from nine_axis import *
 from camera import *
 from parachute import *
+from motor_final import *
 
 bgr = [10,10,130]
 drop_counter = 0
@@ -32,9 +33,11 @@ def  main():
     #ニクロム線焼き切り
     parachute_sep()
 
-    angle = estimate_pos()
-    turn(angle)
-    func_forward()
+    forward(3)
+    
+    #angle = get_heading()
+    rotation(angle)
+    forward(10)
     #画像取得
 
     while True:
@@ -42,6 +45,7 @@ def  main():
         #画像の上下左右反転
         RevImg = cv2.flip(img,-1)
         ThreshImage = img_thresh(RevImg,bgr)
+        #cv2.imshow("image",ThreshImage)
         object_centerX = calc_center(ThreshImage)[0]
         print("centerX : " + str(object_centerX))
         #画面中心のX座標
@@ -49,11 +53,11 @@ def  main():
 
         #物体の重心座標の位置によって回転方向決める
         if object_centerX > screen_centerX:
-            func_right()
+            rotation(30)
         elif object_centerX < screen_centerX:
-            func_left()
+            rotation(-30)
         else:
-            func_forward()
+            forward(1)
 
         """
         終了条件を満たせばwhileループから抜け出す
