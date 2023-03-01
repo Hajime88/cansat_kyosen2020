@@ -19,10 +19,10 @@ highpass_ax, highpass_ay, highpass_az = 0, 0, 0
 timespan =0.25
 old_ax, old_ay, old_az, old_vx, old_vy, old_vz = 0, 0, 0, 0, 0, 0
 
-if(os.path.isfile('drop_accel_data.csv')):
-    os.remove('drop_accel_data.csv')
-f = open('drop_accel_data.csv', 'w')
-f.close()
+#if(os.path.isfile('drop_accel_data.csv')):
+#    os.remove('drop_accel_data.csv')
+#f = open('drop_accel_data.csv', 'w')
+#f.close()
 def write_csv(data):
     dt_now = datetime.datetime.now()
     with open('drop_accel_data.csv', 'a') as f:
