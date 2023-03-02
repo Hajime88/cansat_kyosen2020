@@ -2,9 +2,43 @@
 
 import time
 from icm20948 import ICM20948
-from motor_final import *
 from encoder_final import *
 
+#モーターの初期条件
+AIN1 = 23 #16(BOARD)
+AIN2 = 24 #18 
+PWMA = 18 #12
+BIN1 = 20 #38
+BIN2 = 16 #36
+PWMB = 19 #35 ここは前進、後退を要確認
+
+GPIO.setmode(GPIO.BCM) 
+
+#各ピンを出力に設定
+GPIO.setup(AIN1, GPIO.OUT, initial = GPIO.LOW)
+GPIO.setup(AIN2, GPIO.OUT, initial = GPIO.LOW)
+GPIO.setup(PWMA, GPIO.OUT, initial = GPIO.LOW)
+GPIO.setup(BIN1, GPIO.OUT, initial = GPIO.LOW)
+GPIO.setup(BIN2, GPIO.OUT, initial = GPIO.LOW)
+GPIO.setup(PWMB, GPIO.OUT, initial = GPIO.LOW)
+
+#PWMオブジェクトのインスタンスを作成
+#出力ピン：12,35  周波数：100Hz
+p_a = GPIO.PWM(PWMA,100)
+p_b = GPIO.PWM(PWMB,100)
+
+#PWM信号を出力
+p_a.start(0)
+p_b.start(0)
+
+#デューティを設定(0~100の範囲で指定)
+#速度は80%で走行する。
+val = 80
+
+#デューティ比を設定
+p_a.ChangeDutyCycle(val)
+p_b.ChangeDutyCycle(val)
+#ここまで#
 
 imu = ICM20948()
 
@@ -42,7 +76,7 @@ def nine_axis_calib():
     GPIO.output(BIN1, GPIO.LOW)
     GPIO.output(BIN2, GPIO.HIGH)
 
-    while(1000 < abs(fai)):
+    while(1000 > abs(fai)):
         # Read the current, uncalibrated, X, Y & Z magnetic values from the magnetometer and save as a list
         mag = list(imu.read_magnetometer_data())
         
@@ -99,6 +133,7 @@ def nine_axis_calib():
     GPIO.output(AIN2, GPIO.LOW)
     GPIO.output(BIN1, GPIO.LOW)
     GPIO.output(BIN2, GPIO.LOW)
+    print("calibrated!!")
     return amin, amax
 
 def get_heading():
@@ -179,3 +214,4 @@ if __name__ == '__main__':
     nine_axis_calib()
     while True:
         get_heading()
+    
