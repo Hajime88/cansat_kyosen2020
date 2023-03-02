@@ -133,6 +133,9 @@ def nine_axis_calib():
     GPIO.output(AIN2, GPIO.LOW)
     GPIO.output(BIN1, GPIO.LOW)
     GPIO.output(BIN2, GPIO.LOW)
+    
+    GPIO.cleanup()
+    
     print("calibrated!!")
     return amin, amax
 
