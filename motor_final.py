@@ -138,7 +138,8 @@ def test(x, y, turn):
     destroy()
 
 try:
-    test(0, 0, 45)
+    print("trying")
+#    test(0, 0, 45)
 except KeyboardInterrupt:
     destroy()
     print("program stopped")
