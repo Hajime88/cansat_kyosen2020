@@ -4,16 +4,17 @@
 import RPi.GPIO as GPIO
 import time
 import math
+from nine_axis import get_heading
 
 #encoder_finalのインポート
 from encoder_final import distance, pulse_count
 
-AIN1 = 24 #18 左
-AIN2 = 23 #16
+AIN1 = 23 #16(BOARD)
+AIN2 = 24 #18 
 PWMA = 18 #12
-BIN1 = 16 #36 右
-BIN2 = 20 #38
-PWMB = 19 #35
+BIN1 = 20 #38
+BIN2 = 16 #36
+PWMB = 19 #35 ここは前進、後退を要確認
 
 #ここから初期設定#
 
@@ -38,7 +39,7 @@ p_b.start(0)
 
 #デューティを設定(0~100の範囲で指定)
 #速度は80%で走行する。
-val = 100
+val = 80
 
 #デューティ比を設定
 p_a.ChangeDutyCycle(val)
@@ -66,10 +67,10 @@ def forward(d):
     GPIO.output(BIN2, GPIO.HIGH)
 
     while(l < d):
-        #エンコーダで距離を計測(約0.2秒ごとに値を取得)
+        #エンコーダで距離を計測(約1秒ごとに値を取得)
         R_d, L_d = distance() #エンコーダのファイルより
         l = l+(R_d+L_d)/2
-        print(l)
+        print(l) #練習用
 
 #後退の関数
 #d[m]戻るまで後退
@@ -86,13 +87,20 @@ def back(d):
         #エンコーダで距離を計測
         R_d, L_d = distance() #エンコーダのファイルより
         l = l-(R_d+L_d)/2
-        print(-l)
+        print(l) #練習用
 
 #回転の関数
 #進行方向に対して左にi[deg]だけ回転(-180<i<180)
 def rotation(i):
-    fai = 0 #[deg] ここに回転角を入力
+    fai = get_heading() #九軸から現在の方向を取得
     W = 0.2 #[m] タイヤ間距離
+    theta = fai+i #目標角度 取
+
+    #thetaを-180~180に修正
+    if theta < -180:
+        theta = theta+360
+    elif 180 < theta:
+        theta = theta-360
 
     if i > 0:
         #右輪は前進、左輪は停止
@@ -100,7 +108,29 @@ def rotation(i):
         GPIO.output(AIN2, GPIO.LOW)
         GPIO.output(BIN1, GPIO.LOW)
         GPIO.output(BIN2, GPIO.HIGH)
-    
+        
+        #180前後の不連続点を回避
+        if theta < -160:
+            theta = theta + 360
+            
+            if fai < -160:
+                fai = fai + 360
+
+        if theta < fai :
+            theta = theta + 360
+            while(fai < theta):
+                read_angle = get_heading()
+                if read_angle < 0:
+                    fai = fai + 360
+                else:
+                    fai = read_angle
+
+        else:
+            while(fai < theta):
+                fai = get_heading()
+                if fai < -160:
+                    fai = fai + 360
+
     else:
         #右輪は停止、左輪は前進
         GPIO.output(AIN1, GPIO.LOW)
@@ -108,16 +138,55 @@ def rotation(i):
         GPIO.output(BIN1, GPIO.LOW)
         GPIO.output(BIN2, GPIO.LOW)
 
-    while(abs(fai) < abs(i)-10): #この設定だと誤差が±10度くらいに収まるはず
-        R_d, L_d = distance() #エンコーダのファイルより
-        fai = fai+(R_d-L_d)/W*180/math.pi
-        print(fai)
+        if theta > 160:
+            theta = theta - 360
+            
+            if fai > 160:
+                fai = fai - 360
+
+        if theta > fai :
+            theta = theta - 360
+            while(fai > theta):
+                read_angle = get_heading()
+                if read_angle > 0:
+                    fai = fai - 360
+                else:
+                    fai = read_angle
+
+        else:
+            while(fai > theta):
+                fai = get_heading()
+                if fai > 160:
+                    fai = fai - 360
+        
+        
+            
+# 方位を入力しての角度調整
+def adjust(direction):
+    fai = get_heading() #現在の方向
+
+    i = direction - fai #向きたい方向との角度差
+
+    #iを-180~180に調整
+    if i < -180:
+        i = i + 360
+    elif 180 < i:
+        i = i - 360
+    
+    #角度iだけ回転させる
+    rotation(i)
 
 #終了用
 def destroy():
     #PWM信号の停止
     p_a.stop()
     p_b.stop()
+
+    #ピンを停止状態に戻す
+    GPIO.output(AIN1, GPIO.LOW)
+    GPIO.output(AIN2, GPIO.LOW)
+    GPIO.output(BIN1, GPIO.LOW)
+    GPIO.output(BIN2, GPIO.LOW)
 
     #GPIOピンの解放
     GPIO.cleanup()
@@ -134,9 +203,9 @@ def test(x, y, turn):
 
     rotation(turn)
     brake()
-    
-    destroy()
 
+    destroy()
+    
 try:
     print("trying")
 #    test(0, 0, 45)
