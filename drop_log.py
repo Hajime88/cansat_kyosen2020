@@ -1,9 +1,8 @@
-from nine_axis import *
 from parachute import *
 import time
 from icm20948 import ICM20948
 from led import *
-import serial
+from serialsend import *
 import datetime
 import csv
 import os
@@ -44,81 +43,98 @@ def get_atotal():
 
 drop_counter = 0
 parachute_counter = 0
+drop_counter2 = 0
 impact_counter = 0
 land_counter = 0
-green_light_on()
+#green_light_on()
 
-def SerWrite(msg):
-    ser.write((msg+"\r\n").encode("utf-8"))
 
-try:
-    ser = serial.Serial('/dev/ttyAMA0', 115200, timeout=0.1)
-    print("open serial port")
-    SerWrite("open serial port")
-except:
-    print("cannot open serial port")
-    exit(1)   
 
-#drop_counterは試験をして調整
-while drop_counter < 5:
-    atotal = get_atotal()
-    print("not detect drop",atotal)
-    SerWrite("not detect drop "+str(atotal))
-    write_csv(atotal)
+def drop_land_detect():
 
-    if atotal < 0.1:
-        print("falling!",atotal)
-        SerWrite("falling! "+str(atotal))
+    #drop_counterは試験をして調整
+    while drop_counter < 3:
+        atotal = get_atotal()
+        serial_write("not detect drop "+str(atotal))
         write_csv(atotal)
-        drop_counter = drop_counter + 1
-    time.sleep(0.01)
 
-
-while parachute_counter < 1:
-    atotal = get_atotal()
-    print("not detect parachute",atotal)
-    SerWrite("not detect parachute "+str(atotal))
-    write_csv(atotal)
-    if abs(atotal) > 30:
-        t = 0
-        while t <100:
-            print("parachute opened!",atotal)
-            SerWrite("parachute opened! "+str(atotal))
+        if atotal < 0.2:
+            serial_write("falling! "+str(atotal))
             write_csv(atotal)
-            #time.sleep(0.01)
-            atotal = get_atotal()
-            t = t + 1
-        parachute_counter = parachute_counter + 1
-    
-    time.sleep(0.01)
-
-while impact_counter < 1:
-    atotal = get_atotal()
-    print("not detect impact",atotal)
-    SerWrite("not detect impact "+str(atotal))
-    write_csv(atotal)
-    if abs(atotal) > 50:
-        t = 0
-        while t < 100:
-            print("impact!",atotal)
-            SerWrite("impact! "+str(atotal))
-            write_csv(atotal)
-            #time.sleep(0.01)
-            atotal = get_atotal()
-            t = t + 1
-        impact_counter = impact_counter + 1
+            drop_counter = drop_counter + 1
         time.sleep(0.01)
 
-while land_counter < 500:
-    atotal = get_atotal()
-    print("landed!",atotal)
-    SerWrite("landed! "+str(atotal))
-    write_csv(atotal)
-    land_counter = land_counter + 1
-    time.sleep(0.01)
+    start_time = time.perf_counter()
+    limit_time = 30
 
-green_light_off()
-red_light_on()
-#parachute_sep()
-time.sleep(10)
-red_light_off()
+    while parachute_counter < 1:
+        atotal = get_atotal()
+        serial_write("not detect parachute "+str(atotal))
+        write_csv(atotal)
+        if abs(atotal) > 10:
+            t = 0
+            while t <10:
+                serial_write("parachute opened! "+str(atotal))
+                write_csv(atotal)
+                #time.sleep(0.01)
+                atotal = get_atotal()
+                t = t + 1
+            parachute_counter = parachute_counter + 1
+        
+        if time.perfcounter() -  start_time > limit_time:
+            serial_write("time out! ")
+            break;
+        
+        time.sleep(0.01)
+
+    while drop_counter2 < 3:
+        atotal = get_atotal()
+        serial_write("not detect drop "+str(atotal))
+        write_csv(atotal)
+
+        if atotal < 3:
+            serial_write("dropping with parachute! "+str(atotal))
+            write_csv(atotal)
+            drop_counter2 = drop_counter2 + 1
+        
+        if time.perfcounter() -  start_time > limit_time:
+            serial_write("time out! ")
+            break;
+        
+        time.sleep(0.01)
+
+
+    while impact_counter < 1:
+        atotal = get_atotal()
+        serial_write("not detect impact "+str(atotal))
+        write_csv(atotal)
+        if abs(atotal) > 30:
+            t = 0
+            while t < 10:
+                serial_write("impact! "+str(atotal))
+                write_csv(atotal)
+                #time.sleep(0.01)
+                atotal = get_atotal()
+                t = t + 1
+            impact_counter = impact_counter + 1
+        
+        if time.perfcounter() -  start_time > limit_time:
+            serial_write("time out! ")
+            break;
+        
+        time.sleep(0.01)
+
+    while land_counter < 200:
+        atotal = get_atotal()
+        serial_write("landed! "+str(atotal))
+        write_csv(atotal)
+        land_counter = land_counter + 1
+        time.sleep(0.01)
+
+    #green_light_off()
+    #red_light_on()
+    #parachute_sep()
+    #red_light_off()
+if __name__ == '__main__':
+    drop_land_detect()
+
