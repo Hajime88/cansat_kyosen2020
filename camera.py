@@ -1,7 +1,5 @@
 import cv2 as cv
 import numpy as np
-import random
-import copy
 
 
 #画像から赤の成分を取り出して二値化する関数
@@ -38,11 +36,18 @@ def calc_center(ThreshImage):
         size.append(data[i][4])
     
     #最大の面積を求める
-    max_size = max(size)
-
+    if len(size)!= 0:
+        max_size = max(size)
     #最大の面積を持つラベルの重心を出す
-    num = size.index(max_size)
-    centerX = center[num][0]
-    centerY = center[num][1]
+        num = size.index(max_size)
+        centerX = center[num][0]
+        centerY = center[num][1]
+        return centerX, centerY, max_size
 
-    return centerX, centerY
+    else:
+        print("not detect Redcorn")
+        centerX = 350
+        centerY = 0
+        return centerX, centerY
+
+

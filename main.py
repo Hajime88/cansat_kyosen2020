@@ -7,12 +7,18 @@ from nine_axis import *
 from camera import *
 from parachute import *
 from motor_final import *
+import math
+from judge_movement import *
 
+
+#クレーンとゴールの距離:要計測
+CraneToGoal = 30
 bgr = [10,10,130]
+
 drop_counter = 0
 stop_counter = 0
-
-cap = cv2.VideoCapture(0)
+#クレーンから半径20mの領域に落ちると仮定
+R_search = 20
 
 def  main():
     
@@ -32,41 +38,33 @@ def  main():
 
     #ニクロム線焼き切り
     parachute_sep()
+    #パラシュートから離れる
+    forward(1)
 
-    forward(3)
-    
     #angle = get_heading()
     rotation(angle)
-    forward(10)
-    #画像取得
+    forward(CraneToGoal)
+
+    #この条件式は要検討,直進部分
+    while not_detect_counter < 10:
+        capture_judge(bgr)
+    
+    rotation(135)
+
+    #直進で調べ切れていない部分を四角形に動いて調べる
+    for i in range(4):
+        for j in range(3):
+            forward(R_search*math.sqrt(2)/3)
+            capture_judge(bgr)
+        rotation(90)
 
     while True:
-        ret, img = cap.read()
-        #画像の上下左右反転
-        RevImg = cv2.flip(img,-1)
-        ThreshImage = img_thresh(RevImg,bgr)
-        #cv2.imshow("image",ThreshImage)
-        object_centerX = calc_center(ThreshImage)[0]
-        print("centerX : " + str(object_centerX))
-        #画面中心のX座標
-        screen_centerX = RevImg.shape[1]/2
+        print("I could not detect redcorn, stop!!")
 
-        #物体の重心座標の位置によって回転方向決める
-        if object_centerX > screen_centerX:
-            rotation(30)
-        elif object_centerX < screen_centerX:
-            rotation(-30)
-        else:
-            forward(1)
 
-        """
-        終了条件を満たせばwhileループから抜け出す
-        if ~~  終了条件
-            break
-        """
-
-        while True:
-            print("Goal!")
-
-main()
+if __name__ == '__main__':
+    try:
+        main()
+    except KeyboardInterrupt:
+        destroy()
 
