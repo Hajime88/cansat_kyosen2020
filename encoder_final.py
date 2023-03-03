@@ -40,7 +40,7 @@ def pulse_count(APin, BPin):
 #タイヤがそれぞれ進んだ距離の算出(今は0.2秒ごと)
 def distance():
     pulse = 500 #ppr
-    l = 0.4 #[m] タイヤが一回転する間に進む距離:要再計測
+    l = 2*0.055*math.pi #[m] タイヤが一回転する間に進む距離:要再計測
     k = 0.9 #値を調整するための係数:要調整
     
     R_count_1 = pulse_count(RAPin, RBPin)
@@ -79,9 +79,9 @@ def loop():
     
     while True:
         R_d, L_d = distance()
-        
-        x, y, fai = location(x, y, fai, R_d, L_d)
-        print(x, y)
+        print(R_d, L_d)
+        #x, y, fai = location(x, y, fai, R_d, L_d)
+        #print(x, y)
 
 #1秒ずつ位置を出力
 if __name__ == '__main__':
