@@ -17,7 +17,7 @@ def img_thresh(img,bgr):
     return ThreshImage
 
 #二値画像において白くなっている部分(実際には赤い部分)についてラベリングをして、最大の面積のラベルの重心を求める関数
-def calc_center(ThreshImage):
+def calc_center(ThreshImage, not_detect_counter):
 
     # ラベリング処理 
     # label:ラベル数, ラベル番号の配列データ, data, オブジェクトの重心座標
@@ -41,13 +41,14 @@ def calc_center(ThreshImage):
     #最大の面積を持つラベルの重心を出す
         num = size.index(max_size)
         centerX = center[num][0]
-        centerY = center[num][1]
-        return centerX, centerY, max_size
+        not_detect_counter = not_detect_counter
+        return centerX, max_size,  not_detect_counter
 
     else:
         print("not detect Redcorn")
         centerX = 350
-        centerY = 0
-        return centerX, centerY
+        max_size = 0
+        not_detect_counter = not_detect_counter+1
+        return centerX, max_size, not_detect_counter
 
 

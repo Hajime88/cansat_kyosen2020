@@ -10,13 +10,13 @@ from motor_final import *
 import math
 from judge_movement import *
 
-
 #クレーンとゴールの距離:要計測
 CraneToGoal = 30
 bgr = [10,10,130]
 
 drop_counter = 0
 stop_counter = 0
+not_detect_counter = 0
 #クレーンから半径20mの領域に落ちると仮定
 R_search = 20
 
@@ -47,7 +47,7 @@ def  main():
 
     #この条件式は要検討,直進部分
     while not_detect_counter < 10:
-        capture_judge(bgr)
+        not_detect_counter = capture_judge(bgr,not_detect_counter)
     
     rotation(135)
 
@@ -60,7 +60,6 @@ def  main():
 
     while True:
         print("I could not detect redcorn, stop!!")
-
 
 if __name__ == '__main__':
     try:
