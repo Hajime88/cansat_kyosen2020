@@ -83,7 +83,7 @@ def drop_land_detect():
         
         if time.perfcounter() -  start_time > limit_time:
             serial_write("time out! ")
-            break;
+            break
         
         time.sleep(0.01)
 
@@ -99,7 +99,7 @@ def drop_land_detect():
         
         if time.perfcounter() -  start_time > limit_time:
             serial_write("time out! ")
-            break;
+            break
         
         time.sleep(0.01)
 
@@ -120,7 +120,7 @@ def drop_land_detect():
         
         if time.perfcounter() -  start_time > limit_time:
             serial_write("time out! ")
-            break;
+            break
         
         time.sleep(0.01)
 
@@ -135,6 +135,5 @@ def drop_land_detect():
     #red_light_on()
     #parachute_sep()
     #red_light_off()
-if __name__ == '__main__':
-    drop_land_detect()
+
 

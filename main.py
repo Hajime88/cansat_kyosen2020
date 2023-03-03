@@ -3,15 +3,18 @@
 import RPi.GPIO as GPIO
 import time
 import cv2
-from nine_axis import *
+#from nine_axis import *
 from camera import *
 from parachute import *
 from motor_final import *
 import math
 from judge_movement import *
+from drop_log import *
+from serialsend import *
 
 #クレーンとゴールの距離:要計測
-CraneToGoal = 30
+CraneToGoal = 30  #クレーンからゴールまでの距離
+direction = 90 #クレーンからゴールへの方向
 bgr = [10,10,130]
 
 drop_counter = 0
@@ -21,30 +24,26 @@ not_detect_counter = 0
 R_search = 20
 
 def  main():
-    
-    #落下検知
-    while drop_counter < 1:
-        az = get_az()
-        print("not detect drop")
-        if az > 1:
-            drop_counter = drop_counter + 1
+    ser = None
+    serial_open()
 
-    #落下後停止検知
-    while stop_counter < 12:
-        az = get_az()
-        print("not detect stop")
-        if abs(az) < 0.01:
-            stop_counter = stop_counter + 1
+    #落下検知
+    drop_land_detect()
 
     #ニクロム線焼き切り
     parachute_sep()
     #パラシュートから離れる
     forward(1)
+    serial_write("left from parachute..")
 
-    #angle = get_heading()
-    rotation(angle)
-    forward(CraneToGoal)
+    #クレーンからゴールへの方向directionに向かってCraneToGoalだけ進む
+    n = 5 #直進距離をn分割して方向を修正しながら進む
+    for i in range(n):
+        serial_write("moving to virtual goal.. [i+1]")
+        adjust(direction) 
+        forward(CraneToGoal/n)
 
+######################################
     #この条件式は要検討,直進部分
     while not_detect_counter < 10:
         not_detect_counter = capture_judge(bgr,not_detect_counter)
@@ -59,11 +58,10 @@ def  main():
         rotation(90)
 
     while True:
-        print("I could not detect redcorn, stop!!")
+        serial_write("I could not detect redcorn, stop!!")
 
 if __name__ == '__main__':
     try:
         main()
     except KeyboardInterrupt:
         destroy()
-
