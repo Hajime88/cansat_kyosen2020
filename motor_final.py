@@ -1,4 +1,4 @@
-#モーター
+#モーター+九軸センサー
 
 #ライブラリのインポート
 import RPi.GPIO as GPIO
@@ -6,6 +6,13 @@ import time
 import math
 from icm20948 import ICM20948
 from encoder_final import *
+from parachute import *
+from led import *
+from serialsend import *
+import serial
+import datetime
+import csv
+import os
 
 AIN1 = 23 #16(BOARD)
 AIN2 = 24 #18 
@@ -73,12 +80,12 @@ def nine_axis_calib():
     global amin, amax
 
 
-    GPIO.output(AIN1, GPIO.LOW)
+    GPIO.output(AIN1, GPIO.HIGH)
     GPIO.output(AIN2, GPIO.LOW)
     GPIO.output(BIN1, GPIO.LOW)
     GPIO.output(BIN2, GPIO.HIGH)
 
-    while(1000 > abs(fai)):
+    while(fai < 1000):
         # Read the current, uncalibrated, X, Y & Z magnetic values from the magnetometer and save as a list
         mag = list(imu.read_magnetometer_data())
         
@@ -125,7 +132,7 @@ def nine_axis_calib():
         ## Note:## Headings will not be correct until a full 360 deg calibration turn has been completed to generate amin and amax data ##
         ##########
         
-        print("Heading: {}".format(heading))
+        serial_write("Heading: {}".format(heading))
         #print(mag)
 
         R_d, L_d =distance()
@@ -136,7 +143,8 @@ def nine_axis_calib():
     GPIO.output(BIN1, GPIO.LOW)
     GPIO.output(BIN2, GPIO.LOW)
 
-    print("calibrated!!")
+    serial_write("calibrated!!")
+    time.sleep(3)
     return amin, amax
 
 def get_heading():
@@ -164,8 +172,11 @@ def get_heading():
     ## Note:## Headings will not be correct until a full 360 deg calibration turn has been completed to generate amin and amax data ##
     ##########
     
-    print("Heading: {}".format(heading))
+    serial_write("Heading: {}".format(heading))
     #print(mag)
+    
+    time.sleep(0.1)
+    
     return heading
 
 """
@@ -208,7 +219,9 @@ def get_heading():
     #         # Shift magnetic values to between -0.5 and 0.5 to enable the trig to work
     #        mag[i] += 0.5
 """
+##ここまで九軸の定義
 
+##ここからモーターの関数定義
 #ブレーキの関数
 def brake():
     GPIO.output(AIN1, GPIO.HIGH)
@@ -233,7 +246,7 @@ def forward(d):
         #エンコーダで距離を計測(約1秒ごとに値を取得)
         R_d, L_d = distance() #エンコーダのファイルより
         l = l+(R_d+L_d)/2
-        print(l) #練習用
+        serial_write(l) #練習用
     
     brake()
 
@@ -252,7 +265,7 @@ def back(d):
         #エンコーダで距離を計測
         R_d, L_d = distance() #エンコーダのファイルより
         l = l-(R_d+L_d)/2
-        print(l) #練習用
+        serial_write(l) #練習用
     
     brake()
 
@@ -360,7 +373,8 @@ def destroy():
     #GPIOピンの解放
     GPIO.cleanup()
 
-    print("end of program")
+    serial_write("end of program")
+    
 
 #試験用のプログラム
 def test(x, y, turn):
@@ -371,13 +385,15 @@ def test(x, y, turn):
     rotation(turn)
 
     destroy()
+##ここまでがモーターの関数定義
 
 if __name__ == '__main__':
-    nine_axis_calib()
     try:
-        print("trying")
+        serial_open()
+#         nine_axis_calib()
+        serial_write("trying")
     #   get_heading()  
-    #   test(0, 0, 45)
+        test(0.7, 0, 90)
     except KeyboardInterrupt:
         destroy()
-        print("program stopped")
+        serial_write("trying")
