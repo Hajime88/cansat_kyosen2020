@@ -120,7 +120,7 @@ def drop_land_detect():
         
         if time.perfcounter() -  start_time > limit_time:
             serial_write("time out! ")
-            break
+            break;
         
         time.sleep(0.01)
 

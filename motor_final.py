@@ -265,6 +265,8 @@ def forward(d):
     p_a.ChangeDutyCycle(val_forward)
     p_b.ChangeDutyCycle(val_forward)
 
+    t_start = time.perf_counter()
+
     #モーターを正方向に回転
     GPIO.output(AIN1, GPIO.LOW)
     GPIO.output(AIN2, GPIO.HIGH)
@@ -276,6 +278,12 @@ def forward(d):
         R_d, L_d = distance() #エンコーダのファイルより
         l = l+(R_d+L_d)/2
         serial_write(l) #練習用
+
+        #エンコーダで値が取れなくなったときの回避
+        if time.perf_counter() - t_start > d*6: #要確認
+            serial_write("Attention! Encoder has no value!")
+            break;
+    
     
     brake()
 
@@ -291,6 +299,8 @@ def back(d):
     p_a.ChangeDutyCycle(val_back)
     p_b.ChangeDutyCycle(val_back)
 
+    t_start = time.perf_counter()
+
     #モーターを逆方向に回転
     GPIO.output(AIN1, GPIO.HIGH)
     GPIO.output(AIN2, GPIO.LOW)
@@ -301,7 +311,13 @@ def back(d):
         #エンコーダで距離を計測
         R_d, L_d = distance() #エンコーダのファイルより
         l = l-(R_d+L_d)/2
-        serial_write(l) #練習用
+        serial_write(-l) #練習用
+
+        #エンコーダで値が取れなくなったとき用
+        if time.perf_counter() - t_start > d*8: #要確認
+            serial_write("Attention! Encoder has no value!")
+            break;
+    
     
     brake()
 

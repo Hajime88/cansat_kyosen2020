@@ -17,8 +17,6 @@ CraneToGoal = 30  #クレーンからゴールまでの距離
 direction = 90 #クレーンからゴールへの方向
 bgr = [10,10,130]
 
-drop_counter = 0
-stop_counter = 0
 not_detect_counter = 0
 #クレーンから半径20mの領域に落ちると仮定
 R_search = 20
