@@ -9,7 +9,7 @@ LAPin = 12
 LBPin = 1
 RXPin = 4
 RAPin = 27 
-RBPin = 19  #←変更済み 
+RBPin = 17  #←変更済み 
 
 #初期設定
 GPIO.setmode(GPIO.BCM) 
