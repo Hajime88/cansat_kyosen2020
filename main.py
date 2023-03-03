@@ -34,6 +34,11 @@ def  main():
     forward(1)
     serial_write("left from parachute..")
 
+    #キャリブレーション
+    serial_write("calibration start!")
+    nine_axis_calib()
+    serial_write("caliblation finished!")
+
     #クレーンからゴールへの方向directionに向かってCraneToGoalだけ進む
     n = 5 #直進距離をn分割して方向を修正しながら進む
     for i in range(n):
