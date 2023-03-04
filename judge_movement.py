@@ -5,18 +5,14 @@ from camera import *
 def judge_movement(center_diff):
     ###終了条件:要計測
                   
-    if center_diff > 100:
+    if center_diff > 62:
         print("turn right!!")
         rotation(-10)
-        brake()
-    elif center_diff < -100:
+    elif center_diff < -62:
         print("turn left!!")
         rotation(10)
-        brake()
     else :
         print("forward!!")
-        forward(5)
-        brake()
 
 def sixty_turn(red_zone):
     cap = cv2.VideoCapture(0)
@@ -35,7 +31,7 @@ def sixty_turn(red_zone):
     cap.release()
 
     
-    if max_size > 100:
+    if max_size > 75:
         if center_diff > 100:
             red_zone = "Left"
         elif center_diff < -100:
@@ -49,7 +45,7 @@ def sixty_turn(red_zone):
         else:
             rotation(60)
     
-    return 0, 0
+    return "None", 0
 
 
 
@@ -109,6 +105,7 @@ def sixty_turn(red_zone):
 
 def capture_judge():
     rotation_counter = 0
+    red_zone = "None"
     while rotation_counter < 6:
         red_zone, max_size = sixty_turn(red_zone)
 
@@ -167,10 +164,50 @@ def capture_judge():
                     break
             
             #ゴールへ到着
-            if max_size > 1000:
-                forward(2)
+            if max_size > 5000:
+                #まず一回写真を取る
+                cap = cv2.VideoCapture(0)
+                ret, img = cap.read()
+                #画像の上下左右反転
+                RevImg = cv2.flip(img,-1)
+                cv2.imwrite("image.jpg",RevImg)
+                ThreshImage = img_thresh(RevImg)
+                cv2.imwrite("BWimage.jpg",ThreshImage)
+                object_centerX, max_size = calc_center(ThreshImage)
+                print("centerX : " + str(object_centerX))
+                print("max_size: "+str(max_size))
+                screen_centerX = RevImg.shape[1]/2
+                center_diff = object_centerX - screen_centerX
+                print("center_diff:"+str(center_diff)) #中心位置と赤の重心との差
+                cap.release()
+
+                while max_size < 50000:
+
+                    judgement_counter = 0
+                    while abs(center_diff) > 62 and judgement_counter < 10:
+                        judge_movement(center_diff)
+                        cap = cv2.VideoCapture(0)
+                        ret, img = cap.read()
+                        #画像の上下左右反転
+                        RevImg = cv2.flip(img,-1)
+                        cv2.imwrite("image.jpg",RevImg)
+                        ThreshImage = img_thresh(RevImg)
+                        cv2.imwrite("BWimage.jpg",ThreshImage)
+                        object_centerX, max_size = calc_center(ThreshImage)
+                        print("centerX : " + str(object_centerX))
+                        print("max_size: "+str(max_size))
+                        screen_centerX = RevImg.shape[1]/2
+                        center_diff = object_centerX - screen_centerX
+                        print("center_diff:"+str(center_diff)) #中心位置と赤の重心との差
+                        cap.release()
+
+                        judgement_counter += 1
+                
+                    forward(0.3)
+
+                forward(0.7)
                 while True:
-                    print("Goal")
+                    print("Goal!!!!!!!!!!!!")
         
         rotation_counter += 1
 
