@@ -3,27 +3,29 @@ import numpy as np
 import random
 import copy
 
-cap = cv.VideoCapture(0)
-ret, img = cap.read()
+#cap = cv.VideoCapture(0)   ##pcカメラから画像取得
+#ret, img = cap.read()
+img = cv.imread("test\image_10m_10.jpg")
 
 #画像のサイズを小さくする（前処理）
 height = img.shape[0]
 width = img.shape[1]
-resized_img = cv.resize(img,(round(width), round(height)))
+#resized_img = cv.resize(img,(round(width), round(height)))
+print("image size is", height ,width)
 
 # HSVに変換
-resized_img_HSV = cv.cvtColor(resized_img, cv.COLOR_BGR2HSV)
-cv.imshow("HSV", resized_img_HSV)
+resized_img_HSV = cv.cvtColor(img, cv.COLOR_BGR2HSV)
+#cv.imshow("HSV", resized_img_HSV)
 
 #赤を抽出
-low_hsv_min = np.array([0, 130, 40])
-low_hsv_max = np.array([5, 255, 255])
+low_hsv_min = np.array([0, 108, 30]) #108
+low_hsv_max = np.array([4, 256, 256]) #4
 
 #画像の2値化（Hueが0近辺）
 maskHSV_low = cv.inRange(resized_img_HSV,low_hsv_min,low_hsv_max)
 
-high_hsv_min = np.array([175, 130, 40])
-high_hsv_max = np.array([179, 255, 255])
+high_hsv_min = np.array([168, 108, 30]) #177
+high_hsv_max = np.array([180, 256, 256])
 
 #画像の2値化（Hueが179近辺）
 maskHSV_high = cv.inRange(resized_img_HSV,high_hsv_min,high_hsv_max)
@@ -32,7 +34,7 @@ maskHSV_high = cv.inRange(resized_img_HSV,high_hsv_min,high_hsv_max)
 hsv_mask = maskHSV_low | maskHSV_high
 
 #画像のマスク（合成）
-resultHSV = cv.bitwise_and(resized_img, resized_img, mask = hsv_mask)
+resultHSV = cv.bitwise_and(img, img, mask = hsv_mask)
 
 
 # ラベリング処理
@@ -64,6 +66,7 @@ center_y = center[num][1]
 
 print("centerX : " + str(center_x))
 print("centerY : " + str(center_y))
+print(max_size)
 
 cv.putText(resultHSV, "X: " + str(int(center_x)), (x1 - 30, y1 + 15), cv.FONT_HERSHEY_PLAIN, 1, (0, 255, 255))
 cv.putText(resultHSV, "Y: " + str(int(center_y)), (x1 - 30, y1 + 30), cv.FONT_HERSHEY_PLAIN, 1, (0, 255, 255))
@@ -71,7 +74,7 @@ cv.putText(resultHSV, "Y: " + str(int(center_y)), (x1 - 30, y1 + 30), cv.FONT_HE
 
 cv.imshow("Result mask", hsv_mask)
 cv.imshow("Result HSV", resultHSV)
-cv.imshow("raw img", resized_img)
+cv.imshow("raw img", img)
 
 cv.waitKey(0)
 cv.destroyAllWindows()
