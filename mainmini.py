@@ -9,14 +9,19 @@ from camera import *
 from motor_final import *
 from judge_movement import *
 
-cap = cv2.VideoCapture(0)
+
 #cap.set(cv2.CAP_PROP_AUTO_EXPOSURE,1)
 #cap.set(cv2.CAP_PROP_EXPOSURE,1000)
 not_detect_counter = 0
 
 def  main():
-    global not_detect_counter
-    not_detect_counter = capture_judge(cap,not_detect_counter)
+    ser = None
+    serial_open()
+    nine_axis_calib()
+    capture_judge()
+    while True:
+        print("I couldn't detect redcorn")
+        time.sleep(1.0)
     """
     ret, img = cap.read()
     #画像の上下左右反転
