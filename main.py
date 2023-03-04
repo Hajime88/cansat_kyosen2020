@@ -42,7 +42,7 @@ def  main():
     #クレーンからゴールへの方向directionに向かってCraneToGoalだけ進む
     n = 5 #直進距離をn分割して方向を修正しながら進む
     for i in range(n):
-        serial_write("moving to virtual goal.. [i+1]")
+        serial_write("moving to virtual goal.. ["+str(i+1)+"]")
         adjust(direction) 
         forward(CraneToGoal/n)
 
@@ -68,18 +68,16 @@ def  main():
     capture_judge()
     rotation(-45)
     forward(10*math.sqrt(2))
+    serial_write("1番目の円を探索終了")
+    
+    i = 2
+    while True:
+        capture_judge()
+        rotation(90)
+        forward(10*math.sqrt(2))
+        serial_write(i, "番目の円を探索終了")
+        i = i+1
 
-    capture_judge()
-    rotation(90)
-    forward(10*math.sqrt(2))
-
-    capture_judge()
-    rotation(90)
-    forward(10*math.sqrt(2))
-
-    capture_judge()
-
-##ここからどうしましょう
 
 
 
