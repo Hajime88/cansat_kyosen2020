@@ -65,7 +65,7 @@ def drop_land_detect():
         time.sleep(0.01)
 
     start_time = time.perf_counter()
-    limit_time = 30
+    limit_time = 120
 
     while parachute_counter < 1:
         atotal = get_atotal()
