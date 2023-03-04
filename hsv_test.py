@@ -1,11 +1,15 @@
+####################################################################
+## Run 'opencv_test\env\Scripts\Activate.ps1' befor run this file ##
+####################################################################
+
 import cv2 as cv
 import numpy as np
 import random
 import copy
 
-#cap = cv.VideoCapture(0)   ##pcカメラから画像取得
+#cap = cv.VideoCapture(0)   ##pcカメラから画像取得の場合この二行を使う
 #ret, img = cap.read()
-img = cv.imread("test\image_10m_10.jpg")
+img = cv.imread("test\sample9_0m.jpg")
 
 #画像のサイズを小さくする（前処理）
 height = img.shape[0]
