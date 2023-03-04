@@ -47,21 +47,41 @@ def  main():
         forward(CraneToGoal/n)
 
 ######################################
-    #この条件式は要検討,直進部分
-    while not_detect_counter < 10:
-        not_detect_counter = capture_judge(bgr,not_detect_counter)
+    # #この条件式は要検討,直進部分
+    # while not_detect_counter < 10:
+    #     not_detect_counter = capture_judge(bgr,not_detect_counter)
     
-    rotation(135)
+    # rotation(135)
 
-    #直進で調べ切れていない部分を四角形に動いて調べる
-    for i in range(4):
-        for j in range(3):
-            forward(R_search*math.sqrt(2)/3)
-            capture_judge(bgr)
-        rotation(90)
+    # #直進で調べ切れていない部分を四角形に動いて調べる
+    # for i in range(4):
+    #     for j in range(3):
+    #         forward(R_search*math.sqrt(2)/3)
+    #         capture_judge(bgr)
+    #     rotation(90)
 
-    while True:
-        serial_write("I could not detect redcorn, stop!!")
+    # while True:
+    #     serial_write("I could not detect redcorn, stop!!")
+
+    forward(10) #最初の探索円の中心
+
+    capture_judge()
+    rotation(-45)
+    forward(10*math.sqrt(2))
+
+    capture_judge()
+    rotation(90)
+    forward(10*math.sqrt(2))
+
+    capture_judge()
+    rotation(90)
+    forward(10*math.sqrt(2))
+
+    capture_judge()
+
+##ここからどうしましょう
+
+
 
 if __name__ == '__main__':
     try:
